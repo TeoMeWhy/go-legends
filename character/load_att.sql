@@ -3,4 +3,4 @@ SELECT atributo_primario,
        atributo_terciario
 
 FROM classes
-WHERE nome = 'mago'
+WHERE nome = '{classe}'
