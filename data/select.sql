@@ -1,1 +1,1 @@
-select * from classes;
+select * from chars;

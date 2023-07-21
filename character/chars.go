@@ -3,8 +3,6 @@ package character
 import (
 	"fmt"
 	"go_legends/utils"
-	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -14,69 +12,32 @@ type Character struct {
 	Classe        string
 	Atributos     map[string]int
 	Modificadores map[string]int
+	Exp           int
+	Nivel         int
+	Pontos        int
+	Vitalidade    int
 }
 
-func LoadAtributos(classe string) map[string]int {
-
-	att := map[string]int{}
-
-	con := utils.ConectDB()
-	defer con.Close()
-
-	query := utils.ImportQuery("character/load_att.sql")
-	query = strings.ReplaceAll(query, "{classe}", classe)
-
-	rows, err := con.Query(query)
-	if err != nil {
-		fmt.Println("Não foi possível executar a query")
-	}
-
-	var att1, att2, att3 string
-	for rows.Next() {
-		rows.Scan(&att1, &att2, &att3)
-	}
-	atts := []string{att1, att2, att3}
-
-	dices := utils.RollsDiceN(5, 6)
-	sort.Sort(sort.Reverse(sort.IntSlice(dices)))
-	dices = dices[1 : len(dices)-1]
-
-	for i := range atts {
-		att[atts[i]] = dices[i] + 8
-	}
-
-	return att
+func (c *Character) SetNivel() {
+	c.Nivel = GetNivel(c.Exp)
 }
 
-func loadMods(raca string) map[string]int {
-	mods := map[string]int{}
+func (c *Character) SetVitalidade() {
+	c.Vitalidade = 10 + c.Modificadores["forca"]
+}
 
-	con := utils.ConectDB()
-	defer con.Close()
-
-	query := utils.ImportQuery("character/load_mods.sql")
-	query = strings.ReplaceAll(query, "{raca}", raca)
-
-	rows, err := con.Query(query)
-	if err != nil {
-		fmt.Println("Não foi possível executar a query")
+func (c *Character) AddXP(xp int) {
+	c.Exp += xp
+	for novoNivel := GetNivel(c.Exp); novoNivel > c.Nivel; novoNivel-- {
+		c.Pontos += nivelPonto[novoNivel]
 	}
-
-	var d, f, i string
-	for rows.Next() {
-		rows.Scan(&d, &f, &i)
-	}
-
-	mods["destreza"], _ = strconv.Atoi(d)
-	mods["forca"], _ = strconv.Atoi(f)
-	mods["inteligencia"], _ = strconv.Atoi(i)
-	return mods
+	c.SetNivel()
 }
 
 func NewChar(nome, raca, classe string) *Character {
 
 	mods := loadMods(raca)
-	att := LoadAtributos(classe)
+	att := loadAtributos(classe)
 
 	char := Character{
 		Nome:          nome,
@@ -85,5 +46,123 @@ func NewChar(nome, raca, classe string) *Character {
 		Atributos:     att,
 		Modificadores: mods,
 	}
+
+	char.SetNivel()
+	char.SetVitalidade()
 	return &char
+}
+
+func SaveChar(c *Character) {
+
+	con := utils.ConectDB()
+	defer con.Close()
+
+	attForca := c.Atributos["forca"]
+	attDestreza := c.Atributos["destreza"]
+	attInteligencia := c.Atributos["inteligencia"]
+	modForca := c.Modificadores["forca"]
+	modDestreza := c.Modificadores["destreza"]
+	modInteligencia := c.Modificadores["inteligencia"]
+
+	query := "DELETE FROM chars WHERE nome = '{nome}';"
+	query = strings.ReplaceAll(query, "{nome}", c.Nome)
+	con.Exec(query)
+
+	query = `INSERT INTO chars (
+		nome,
+		raca,
+		classe,
+		exp,
+		nivel,
+		pontos,
+		vitalidade,
+		att_forca,
+		att_destreza,
+		att_inteligencia,
+		mod_forca,
+		mod_destreza,
+		mod_inteligencia
+	)
+	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);`
+
+	stmt, err := con.Prepare(query)
+	if err != nil {
+		fmt.Println("Não foi possível preparar a query")
+	}
+
+	_, err = stmt.Exec(c.Nome,
+		c.Raca,
+		c.Classe,
+		c.Exp,
+		c.Nivel,
+		c.Pontos,
+		c.Vitalidade,
+		attForca,
+		attDestreza,
+		attInteligencia,
+		modForca,
+		modDestreza,
+		modInteligencia)
+
+	if err != nil {
+		fmt.Println("Não foi possível executar o statement.")
+	}
+
+}
+
+func LoadChar(nome string) *Character {
+	con := utils.ConectDB()
+	defer con.Close()
+
+	query := "SELECT * FROM chars WHERE nome = '{nome}'"
+	query = strings.ReplaceAll(query, "{nome}", nome)
+
+	rows, err := con.Query(query)
+	if err != nil {
+		fmt.Println("Erro ao executar a query de char")
+	}
+
+	var raca, classe string
+	var exp, nivel, pontos, vitalidade int
+	var attForca, attDestreza, attInteligencia int
+	var modForca, modDestreza, modInteligencia int
+
+	for rows.Next() {
+		rows.Scan(
+			&nome,
+			&raca,
+			&classe,
+			&exp,
+			&nivel,
+			&pontos,
+			&vitalidade,
+			&attForca,
+			&attDestreza,
+			&attInteligencia,
+			&modForca,
+			&modDestreza,
+			&modInteligencia,
+		)
+	}
+
+	return &Character{
+		Nome:   nome,
+		Raca:   raca,
+		Classe: classe,
+		Atributos: map[string]int{
+			"forca":        attForca,
+			"destreza":     attDestreza,
+			"inteligencia": attInteligencia,
+		},
+		Modificadores: map[string]int{
+			"forca":        modForca,
+			"destreza":     modDestreza,
+			"inteligencia": modInteligencia,
+		},
+		Exp:        exp,
+		Nivel:      nivel,
+		Pontos:     pontos,
+		Vitalidade: vitalidade,
+	}
+
 }
