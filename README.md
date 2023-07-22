@@ -1,5 +1,7 @@
 # Go Lengends
 
+<img src="https://i.ibb.co/kQz8T6f/0-0-fundo-t.png" width=200>
+
 Joguinho de RPG feito em GoLang para brincar com o chat da Twitch.
 
 Projeto com principal objetivo de colocar em prática os estudos a respeito da linguagem Go.
