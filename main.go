@@ -7,10 +7,7 @@ import (
 
 func main() {
 
-	// teo := character.NewChar("Téo", "anao", "guerreiro")
-
-	// fmt.Println(teo)
-	// teo.AddXP(7000)
+	// teo := character.NewChar("Téo", "humano", "guerreiro")
 	// fmt.Println(teo)
 
 	// character.SaveChar(teo)
