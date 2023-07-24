@@ -7,15 +7,13 @@ import (
 )
 
 type Character struct {
-	Nome          string
-	Raca          string
-	Classe        string
-	Atributos     map[string]int
-	Modificadores map[string]int
-	Exp           int
-	Nivel         int
-	Pontos        int
-	Vitalidade    int
+	Classe
+	Raca
+	Nome       string
+	Exp        int
+	Nivel      int
+	Pontos     int
+	Vitalidade int
 }
 
 func (c *Character) SetNivel() {
@@ -36,15 +34,10 @@ func (c *Character) AddXP(xp int) {
 
 func NewChar(nome, raca, classe string) *Character {
 
-	mods := loadMods(raca)
-	att := loadAtributos(classe)
-
 	char := Character{
-		Nome:          nome,
-		Raca:          raca,
-		Classe:        classe,
-		Atributos:     att,
-		Modificadores: mods,
+		Nome:   nome,
+		Raca:   *NewRaca(raca),
+		Classe: *NewClasse(classe),
 	}
 
 	char.SetNivel()
@@ -91,8 +84,8 @@ func SaveChar(c *Character) {
 	}
 
 	_, err = stmt.Exec(c.Nome,
-		c.Raca,
-		c.Classe,
+		c.NomeRaca,
+		c.NomeClasse,
 		c.Exp,
 		c.Nivel,
 		c.Pontos,
@@ -145,24 +138,28 @@ func LoadChar(nome string) *Character {
 		)
 	}
 
-	return &Character{
+	c := &Character{
 		Nome:   nome,
-		Raca:   raca,
-		Classe: classe,
-		Atributos: map[string]int{
-			"forca":        attForca,
-			"destreza":     attDestreza,
-			"inteligencia": attInteligencia,
-		},
-		Modificadores: map[string]int{
-			"forca":        modForca,
-			"destreza":     modDestreza,
-			"inteligencia": modInteligencia,
-		},
+		Raca:   *NewRaca(raca),
+		Classe: *NewClasse(classe),
+
 		Exp:        exp,
 		Nivel:      nivel,
 		Pontos:     pontos,
 		Vitalidade: vitalidade,
 	}
 
+	c.Atributos = map[string]int{
+		"forca":        attForca,
+		"destreza":     attDestreza,
+		"inteligencia": attInteligencia,
+	}
+
+	c.Modificadores = map[string]int{
+		"forca":        modForca,
+		"destreza":     modDestreza,
+		"inteligencia": modInteligencia,
+	}
+
+	return c
 }
