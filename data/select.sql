@@ -1,1 +1,1 @@
-select * from chars;
+select * from chars_itens;

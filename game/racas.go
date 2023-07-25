@@ -1,4 +1,4 @@
-package character
+package game
 
 import (
 	"fmt"
@@ -24,7 +24,7 @@ func (r *Raca) LoadMods() {
 	con := utils.ConectDB()
 	defer con.Close()
 
-	query := utils.ImportQuery("character/load_mods.sql")
+	query := utils.ImportQuery("game/load_mods.sql")
 	query = strings.ReplaceAll(query, "{raca}", raca)
 
 	rows, err := con.Query(query)

@@ -1,4 +1,4 @@
-package character
+package game
 
 import (
 	"fmt"
@@ -60,7 +60,7 @@ func (c *Classe) LoadAtributos() {
 	con := utils.ConectDB()
 	defer con.Close()
 
-	query := utils.ImportQuery("character/load_att.sql")
+	query := utils.ImportQuery("game/load_att.sql")
 	query = strings.ReplaceAll(query, "{classe}", c.NomeClasse)
 
 	rows, err := con.Query(query)

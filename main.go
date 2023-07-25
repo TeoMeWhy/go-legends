@@ -2,16 +2,20 @@ package main
 
 import (
 	"fmt"
-	"go_legends/character"
+	"go_legends/game"
 )
 
 func main() {
 
-	// teo := character.NewChar("Téo", "humano", "guerreiro")
-	// fmt.Println(teo)
-
-	// character.SaveChar(teo)
-
-	teo := character.LoadChar("Téo")
+	teo := game.NewChar("Téo", "elfo", "arqueiro")
 	fmt.Println(teo)
+
+	teo.Items["armadura"] = *game.LoadItem("Armadura de Couro")
+
+	fmt.Println(teo)
+	game.SaveChar(teo)
+
+	teo = game.LoadChar("Téo")
+	fmt.Println(teo)
+
 }
