@@ -1,4 +1,4 @@
-# Go Lengends
+# Go Legends
 
 <img src="https://i.ibb.co/kQz8T6f/0-0-fundo-t.png" width=200>
 
