@@ -27,10 +27,10 @@ VALUES
     ('Espada Élfica da Velocidade', 'Uma espada fina e leve, permitindo ataques rápidos e precisos.', 'arma', 8, 8, 1, 900, 10),
 
     -- Machado
-    ('Machete básica', 'Machete simples para atques rápidos e curtos.', 'arma', 1, 0, 0, 1000, 1),
+    ('Machete Básica', 'Machete simples para atques rápidos e curtos.', 'arma', 1, 0, 0, 1000, 1),
 
     -- Adaga
-    ('Adaga da cozinha', 'Adaga simples para pequenos furtos.', 'arma', 0, 1, 0, 150, 1),
+    ('Adaga da Cozinha', 'Adaga simples para pequenos furtos.', 'arma', 0, 1, 0, 150, 1),
 
     -- Arcos
     ('Arco Simples', 'Arco leve para curtas distâncias.', 'arma', 0, 1, 0, 650, 1),

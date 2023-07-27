@@ -2,20 +2,16 @@ package main
 
 import (
 	"fmt"
-	"go_legends/game"
+	"go_legends/api"
+	"net/http"
 )
 
 func main() {
 
-	teo := game.NewChar("Téo", "elfo", "arqueiro")
-	fmt.Println(teo)
+	http.HandleFunc("/chars/", api.GetCharacter)
 
-	teo.Items["armadura"] = *game.LoadItem("Armadura de Couro")
+	http.HandleFunc("/create_char", api.CreateCharacter)
 
-	fmt.Println(teo)
-	game.SaveChar(teo)
-
-	teo = game.LoadChar("Téo")
-	fmt.Println(teo)
-
+	fmt.Println("Servidor rodando na porta 8080...")
+	http.ListenAndServe(":8080", nil)
 }

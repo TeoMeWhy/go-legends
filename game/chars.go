@@ -37,8 +37,8 @@ func (c *Character) SetNivel() {
 
 func (c *Character) SetVitalidade() {
 	c.Vitalidade = 10 + c.Modificadores["forca"]
-	for _, v := range c.Items {
-		c.Vitalidade += v.Atributos["forca"]
+	for _, i := range c.Items {
+		c.Vitalidade += i.Atributos["forca"]
 	}
 }
 
@@ -56,7 +56,7 @@ func (c *Character) SetItemInicial() {
 	case "mago":
 		items["arma"] = *LoadItem("Cetro Iniciante")
 	case "ladino":
-		items["arma"] = *LoadItem("Adaga da cozinha")
+		items["arma"] = *LoadItem("Adaga da Cozinha")
 	}
 	c.Items = items
 }
