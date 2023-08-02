@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"go_legends/game"
 	"net/http"
-	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 type CharBaseAPI struct {
@@ -39,25 +40,25 @@ func GetCharacter(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	splitURL := strings.Split(r.URL.Path, "/")
-	nome := splitURL[len(splitURL)-1]
+	params := mux.Vars(r)
+	nome := params["nome"]
 
 	char := game.LoadChar(nome)
 	charAPI := CharGameToAPI(char)
-	json.NewEncoder(w).Encode(charAPI)
 
+	if charAPI.Raca == "" {
+		http.Error(w, "Char não encontrado", http.StatusNotFound)
+		return
+	}
+
+	json.NewEncoder(w).Encode(charAPI)
 }
 
 func CreateCharacter(w http.ResponseWriter, r *http.Request) {
 
-	var params CharBaseAPI
-
 	w.Header().Set("Content-Type", "application/json")
 
-	if r.Method != http.MethodPost {
-		http.Error(w, "Método não permitido para esta rota", http.StatusMethodNotAllowed)
-		return
-	}
+	var params CharBaseAPI
 
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
